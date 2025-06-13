@@ -12,14 +12,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      <ProjectReference Include="..\..\src\LasseVK.Extensions.Configuration\LasseVK.Extensions.Configuration.csproj" />
+      <ProjectReference Include="..\..\src\LasseVK.Extensions.Hosting.ConsoleApplications\LasseVK.Extensions.Hosting.ConsoleApplications.csproj" />
+      <ProjectReference Include="..\..\src\LasseVK.Extensions.Hosting\LasseVK.Extensions.Hosting.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\LasseVK.Extensions.Configuration\LasseVK.Extensions.Configuration.csproj" />
-      <ProjectReference Include="..\..\src\LasseVK.Extensions.Hosting\LasseVK.Extensions.Hosting.csproj" />
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LasseVK.Extensions.Configuration\LasseVK.Extensions.Configuration.csproj" />
+      <ProjectReference Include="..\LasseVK.Extensions.Hosting\LasseVK.Extensions.Hosting.csproj" />
+      <ProjectReference Include="..\LasseVK.Extensions.Tasks\LasseVK.Extensions.Tasks.csproj" />
+    </ItemGroup>
+
+</Project>
