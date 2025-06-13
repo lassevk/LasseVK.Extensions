@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace LasseVK.Extensions.Hosting.ConsoleApplications;
+namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
 public class RunCommandLineApplicationBackgroundServiceOptions
 {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace LasseVK.Extensions.Hosting.ConsoleApplications;
+namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
 internal class RunCommandLineApplicationBackgroundService : BackgroundService
 {
@@ -23,16 +23,19 @@ internal class RunCommandLineApplicationBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         ICommandLineApplication? consoleApplication = _options.Value.GetConsoleApplication(_services);
+
         if (consoleApplication is null)
         {
             throw new InvalidOperationException("No console application configured.");
         }
 
+        CommandLineArgumentsInjector.Inject(Environment.GetCommandLineArgs().Skip(1).ToArray(), consoleApplication);
+
         try
         {
             var tcs = new TaskCompletionSource<bool>();
-            _hostApplicationLifetime.ApplicationStarted.Register(() => tcs.SetResult(true));
-            _hostApplicationLifetime.ApplicationStopping.Register(() => tcs.SetCanceled(_hostApplicationLifetime.ApplicationStopping));
+            _hostApplicationLifetime.ApplicationStarted.Register(() => tcs.TrySetResult(true));
+            _hostApplicationLifetime.ApplicationStopping.Register(() =>  tcs.TrySetCanceled(_hostApplicationLifetime.ApplicationStopping));
             await tcs.Task;
 
             _logger.LogDebug("Starting console application");

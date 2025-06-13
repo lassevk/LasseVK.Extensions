@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications;
@@ -9,7 +11,7 @@ public static class HostApplicationBuilderExtensions
         where T : class, ICommandLineApplication
     {
         builder.Services.AddHostedService<RunCommandLineApplicationBackgroundService>();
-        builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.SetConsoleApplication<T>(configure));
+        builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.SetConsoleApplication(configure));
         return builder;
     }
 }
