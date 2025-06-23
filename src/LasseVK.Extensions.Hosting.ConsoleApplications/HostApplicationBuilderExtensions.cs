@@ -14,4 +14,12 @@ public static class HostApplicationBuilderExtensions
         builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.SetConsoleApplication(configure));
         return builder;
     }
+
+    public static IHostApplicationBuilder AddCommandLineCommand<T>(this IHostApplicationBuilder builder, Action<T>? configure = null)
+        where T : class, ICommandLineApplication
+    {
+        builder.Services.AddHostedService<RunCommandLineApplicationBackgroundService>();
+        builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.AddCommand(configure));
+        return builder;
+    }
 }

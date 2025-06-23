@@ -9,6 +9,7 @@ internal class CommandLineArgumentsContext
 
     private ICommandLineProperty? _currentHandler;
     private string? _currentOption;
+    private bool _parseOptions = true;
 
     public CommandLineArgumentsContext(Dictionary<string, ICommandLineProperty> optionHandlers, List<ICommandLineProperty> positionalHandlers)
     {
@@ -20,7 +21,7 @@ internal class CommandLineArgumentsContext
 
     public void Process(string argument)
     {
-        if (argument.StartsWith('-') || argument.StartsWith('/'))
+        if (_parseOptions && (argument.StartsWith('-') || argument.StartsWith('/')))
         {
             ProcessOption(argument);
         }
@@ -104,11 +105,17 @@ internal class CommandLineArgumentsContext
     {
         switch (_positionalHandlers[0].Accept(value))
         {
+
             case ArgumentHandlerAcceptResponse.ContinueAccepting:
                 break;
 
             case ArgumentHandlerAcceptResponse.Finished:
                 _positionalHandlers.RemoveAt(0);
+                break;
+
+            case ArgumentHandlerAcceptResponse.StopParsing:
+                _positionalHandlers.RemoveAt(0);
+                _parseOptions = false;
                 break;
 
             case ArgumentHandlerAcceptResponse.InvalidValue:

@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using LasseVK.Extensions.Hosting.ConsoleApplications.Attributes;
+
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Handlers;
 
 internal class StringCommandLineProperty : CommandLineProperty, ICommandLineProperty
@@ -8,22 +10,37 @@ internal class StringCommandLineProperty : CommandLineProperty, ICommandLineProp
     private readonly object _instance;
 
     private bool _valueWasSet;
+    private bool _stopParsingAfter;
 
     private StringCommandLineProperty(PropertyInfo property, object instance, string name, string? description)
         : base(name, description)
     {
         _property = property ?? throw new ArgumentNullException(nameof(property));
         _instance = instance ?? throw new ArgumentNullException(nameof(instance));
+        _stopParsingAfter = property.IsDefined(typeof(StopParsingOptionsAfterAttribute));
     }
 
     public ArgumentHandlerAcceptResponse Accept(string argument)
     {
         _property.SetValue(_instance, argument);
         _valueWasSet = true;
-        return ArgumentHandlerAcceptResponse.Finished;
+        return _stopParsingAfter ? ArgumentHandlerAcceptResponse.StopParsing : ArgumentHandlerAcceptResponse.Finished;
     }
 
-    public ArgumentHandlerFinishResponse Finish() => !_valueWasSet ? ArgumentHandlerFinishResponse.MissingValue : ArgumentHandlerFinishResponse.Finished;
+    public ArgumentHandlerFinishResponse Finish()
+    {
+        if (_valueWasSet)
+        {
+            return ArgumentHandlerFinishResponse.Finished;
+        }
+
+        if (_property.GetValue(_instance) is string value)
+        {
+            return ArgumentHandlerFinishResponse.Finished;
+        }
+
+        return ArgumentHandlerFinishResponse.MissingValue;
+    }
 
     public override IEnumerable<string> GetHelpText()
     {
