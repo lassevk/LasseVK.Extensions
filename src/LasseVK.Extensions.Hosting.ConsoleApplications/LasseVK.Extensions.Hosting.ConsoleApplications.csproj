@@ -7,9 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LasseVK.Extensions.Configuration\LasseVK.Extensions.Configuration.csproj" />
-      <ProjectReference Include="..\LasseVK.Extensions.Hosting\LasseVK.Extensions.Hosting.csproj" />
-      <ProjectReference Include="..\LasseVK.Extensions.Tasks\LasseVK.Extensions.Tasks.csproj" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
     </ItemGroup>
 
 </Project>
