@@ -1,4 +1,6 @@
-﻿using LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
+﻿using System.Reflection;
+
+using LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +22,22 @@ public static class HostApplicationBuilderExtensions
     {
         builder.Services.AddHostedService<RunCommandLineApplicationBackgroundService>();
         builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.AddCommand(configure));
+        return builder;
+    }
+
+    public static IHostApplicationBuilder AddCommandLineCommands<TProgram>(this IHostApplicationBuilder builder)
+        where TProgram : class
+    {
+        builder.Services.AddHostedService<RunCommandLineApplicationBackgroundService>();
+
+        foreach (Type type in typeof(TProgram).Assembly.GetTypes())
+        {
+            if (type.IsAssignableTo(typeof(ICommandLineApplication)) && !type.IsAbstract)
+            {
+                builder.Services.Configure<RunCommandLineApplicationBackgroundServiceOptions>(options => options.AddCommand(type));
+            }
+        }
+
         return builder;
     }
 }

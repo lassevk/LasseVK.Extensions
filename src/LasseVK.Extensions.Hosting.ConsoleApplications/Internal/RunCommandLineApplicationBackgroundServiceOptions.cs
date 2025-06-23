@@ -63,4 +63,11 @@ internal class RunCommandLineApplicationBackgroundServiceOptions
             return command;
         });
     }
+
+    public void AddCommand(Type type)
+    {
+        string name = type.GetCustomAttribute<CommandLineCommandAttribute>()?.Name ?? type.Name.Replace("Command", "");;
+
+        _commands.Add(name, services => (ICommandLineApplication)ActivatorUtilities.CreateInstance(services, type));
+    }
 }
