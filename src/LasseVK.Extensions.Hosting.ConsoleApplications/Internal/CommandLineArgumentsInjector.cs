@@ -9,8 +9,8 @@ public class CommandLineArgumentsInjector
         ArgumentNullException.ThrowIfNull(args);
         ArgumentNullException.ThrowIfNull(instance);
 
-        Dictionary<string, IArgumentHandler> handlers = GetArgumentHandlers(instance);
-        List<IArgumentHandler> positionalHandlers = GetPositionalArgumentHandlers(instance);
+        Dictionary<string, ICommandLineProperty> handlers = GetArgumentHandlers(instance);
+        List<ICommandLineProperty> positionalHandlers = GetPositionalArgumentHandlers(instance);
 
         var context = new CommandLineArgumentsContext(handlers, positionalHandlers);
         foreach (string argument in args)
@@ -26,12 +26,12 @@ public class CommandLineArgumentsInjector
         }
     }
 
-    private static Dictionary<string, IArgumentHandler> GetArgumentHandlers(object instance)
+    private static Dictionary<string, ICommandLineProperty> GetArgumentHandlers(object instance)
     {
-        Dictionary<string, IArgumentHandler> handlers = [];
+        Dictionary<string, ICommandLineProperty> handlers = [];
 
-        Dictionary<string, IArgumentHandler> handlersForInstance = CommandLineArgumentsReflector.ReflectOptionProperties(instance);
-        foreach (KeyValuePair<string, IArgumentHandler> kvp in handlersForInstance)
+        Dictionary<string, ICommandLineProperty> handlersForInstance = CommandLineArgumentsReflector.ReflectOptionProperties(instance);
+        foreach (KeyValuePair<string, ICommandLineProperty> kvp in handlersForInstance)
         {
             handlers.Add(kvp.Key, kvp.Value);
         }
@@ -39,12 +39,12 @@ public class CommandLineArgumentsInjector
         return handlers;
     }
 
-    private static List<IArgumentHandler> GetPositionalArgumentHandlers(object instance)
+    private static List<ICommandLineProperty> GetPositionalArgumentHandlers(object instance)
     {
         List<PositionalArgumentHandler> positionalHandlers = CommandLineArgumentsReflector.ReflectPositionalProperties(instance);
 
         positionalHandlers.Sort((x, y) => x.Position.CompareTo(y.Position));
 
-        return positionalHandlers.Select(pah => pah.Handler).ToList();
+        return positionalHandlers.Select(pah => pah.Property).ToList();
     }
 }

@@ -2,21 +2,19 @@
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Handlers;
 
-internal class BooleanArgumentHandler : IArgumentHandler
+internal class BooleanCommandLineProperty : CommandLineProperty, ICommandLineProperty
 {
     private readonly PropertyInfo _property;
     private readonly object _instance;
 
     private bool _valueWasSet;
 
-    private BooleanArgumentHandler(PropertyInfo property, object instance, string name)
+    private BooleanCommandLineProperty(PropertyInfo property, object instance, string name, string? description)
+        : base(name, description)
     {
         _property = property ?? throw new ArgumentNullException(nameof(property));
         _instance = instance ?? throw new ArgumentNullException(nameof(instance));
-        Name = name;
     }
-
-    public string Name { get; }
 
     public ArgumentHandlerAcceptResponse Accept(string argument)
     {
@@ -55,5 +53,16 @@ internal class BooleanArgumentHandler : IArgumentHandler
         return ArgumentHandlerFinishResponse.Finished;
     }
 
-    public static IArgumentHandler Factory(PropertyInfo property, object instance, string name) => new BooleanArgumentHandler(property, instance, name);
+    public override IEnumerable<string> GetHelpText()
+    {
+        foreach (string line in base.GetHelpText())
+        {
+            yield return line;
+        }
+
+        yield return Name + " is a boolean value, valid values are: yes, 1, on, true, no, 0, off, false";
+        yield return "if the value is omitted, the value is assumed to be true";
+    }
+
+    public static ICommandLineProperty Factory(PropertyInfo property, object instance, string name, string? description) => new BooleanCommandLineProperty(property, instance, name, description);
 }

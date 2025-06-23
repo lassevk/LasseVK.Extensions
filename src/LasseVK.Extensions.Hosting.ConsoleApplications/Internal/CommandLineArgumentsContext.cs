@@ -4,13 +4,13 @@ namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
 internal class CommandLineArgumentsContext
 {
-    private readonly Dictionary<string, IArgumentHandler> _optionHandlers;
-    private readonly List<IArgumentHandler> _positionalHandlers;
+    private readonly Dictionary<string, ICommandLineProperty> _optionHandlers;
+    private readonly List<ICommandLineProperty> _positionalHandlers;
 
-    private IArgumentHandler? _currentHandler;
+    private ICommandLineProperty? _currentHandler;
     private string? _currentOption;
 
-    public CommandLineArgumentsContext(Dictionary<string, IArgumentHandler> optionHandlers, List<IArgumentHandler> positionalHandlers)
+    public CommandLineArgumentsContext(Dictionary<string, ICommandLineProperty> optionHandlers, List<ICommandLineProperty> positionalHandlers)
     {
         _optionHandlers = optionHandlers ?? throw new ArgumentNullException(nameof(optionHandlers));
         _positionalHandlers = positionalHandlers ?? throw new ArgumentNullException(nameof(positionalHandlers));
@@ -48,7 +48,7 @@ internal class CommandLineArgumentsContext
             trimmedOption = trimmedOption[..parameterIndex];
         }
 
-        if (!_optionHandlers.TryGetValue(trimmedOption, out IArgumentHandler? handler))
+        if (!_optionHandlers.TryGetValue(trimmedOption, out ICommandLineProperty? handler))
         {
             Errors.Add($"No command line option {option} found");
             return;
@@ -145,7 +145,7 @@ internal class CommandLineArgumentsContext
     {
         EndPreviousOption();
 
-        foreach (IArgumentHandler handler in _positionalHandlers)
+        foreach (ICommandLineProperty handler in _positionalHandlers)
         {
             if (handler.Finish() == ArgumentHandlerFinishResponse.MissingValue)
             {

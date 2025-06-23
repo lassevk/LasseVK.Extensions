@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.ComponentModel;
+using System.Numerics;
 using System.Reflection;
 
 using LasseVK.Extensions.Hosting.ConsoleApplications.Attributes;
@@ -8,16 +9,16 @@ namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
 internal static class CommandLineArgumentsReflector
 {
-    private static readonly Dictionary<Type, Func<PropertyInfo, object, string, IArgumentHandler?>> _argumentHandlers = [];
+    private static readonly Dictionary<Type, Func<PropertyInfo, object, string, string?, ICommandLineProperty?>> _argumentHandlers = [];
 
     static CommandLineArgumentsReflector()
     {
-        _argumentHandlers.Add(typeof(List<string>), StringListArgumentHandler.Factory);
-        _argumentHandlers.Add(typeof(bool), BooleanArgumentHandler.Factory);
-        _argumentHandlers.Add(typeof(bool?), BooleanArgumentHandler.Factory);
+        _argumentHandlers.Add(typeof(List<string>), StringListCommandLineProperty.Factory);
+        _argumentHandlers.Add(typeof(bool), BooleanCommandLineProperty.Factory);
+        _argumentHandlers.Add(typeof(bool?), BooleanCommandLineProperty.Factory);
 
-        _argumentHandlers.Add(typeof(string), StringArgumentHandler.Factory);
-        _argumentHandlers.Add(typeof(Guid), GuidArgumentHandler.Factory);
+        _argumentHandlers.Add(typeof(string), StringCommandLineProperty.Factory);
+        _argumentHandlers.Add(typeof(Guid), GuidCommandLineProperty.Factory);
 
         addNumberHandler<byte>();
         addNumberHandler<sbyte>();
@@ -45,15 +46,13 @@ internal static class CommandLineArgumentsReflector
         void addNumberHandler<T>()
             where T : struct, INumber<T>
         {
-            _argumentHandlers.Add(typeof(T), NumericArgumentHandler<T>.Factory);
-            _argumentHandlers.Add(typeof(T?), NumericArgumentHandler<T>.Factory);
+            _argumentHandlers.Add(typeof(T), NumericCommandLineProperty<T>.Factory);
+            _argumentHandlers.Add(typeof(T?), NumericCommandLineProperty<T>.Factory);
         }
     }
 
     private static IEnumerable<PropertyInfo> GetEligibleProperties(object instance)
     {
-        Dictionary<string, IArgumentHandler> result = [];
-
         foreach (PropertyInfo property in instance.GetType().GetProperties())
         {
             if (property is not { CanRead: true })
@@ -70,13 +69,13 @@ internal static class CommandLineArgumentsReflector
         }
     }
 
-    public static Dictionary<string, IArgumentHandler> ReflectOptionProperties(object instance)
+    public static Dictionary<string, ICommandLineProperty> ReflectOptionProperties(object instance)
     {
-        Dictionary<string, IArgumentHandler> result = [];
+        Dictionary<string, ICommandLineProperty> result = [];
 
         foreach (PropertyInfo property in GetEligibleProperties(instance))
         {
-            if (!_argumentHandlers.TryGetValue(property.PropertyType, out Func<PropertyInfo, object, string, IArgumentHandler?>? handlerFactory))
+            if (!_argumentHandlers.TryGetValue(property.PropertyType, out Func<PropertyInfo, object, string, string?, ICommandLineProperty?>? handlerFactory))
             {
                 continue;
             }
@@ -88,8 +87,9 @@ internal static class CommandLineArgumentsReflector
             }
 
             string name = property.GetCustomAttribute<ArgumentNameAttribute>()?.Name ?? property.Name;
+            string? description = property.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
-            IArgumentHandler? handler = handlerFactory(property, instance, name);
+            ICommandLineProperty? handler = handlerFactory(property, instance, name, description);
             if (handler is null)
             {
                 continue;
@@ -110,7 +110,7 @@ internal static class CommandLineArgumentsReflector
 
         foreach (PropertyInfo property in GetEligibleProperties(instance))
         {
-            if (!_argumentHandlers.TryGetValue(property.PropertyType, out Func<PropertyInfo, object, string, IArgumentHandler?>? handlerFactory))
+            if (!_argumentHandlers.TryGetValue(property.PropertyType, out Func<PropertyInfo, object, string, string?, ICommandLineProperty?>? handlerFactory))
             {
                 continue;
             }
@@ -123,8 +123,9 @@ internal static class CommandLineArgumentsReflector
             }
 
             string name = property.GetCustomAttribute<ArgumentNameAttribute>()?.Name ?? property.Name;
+            string? description = property.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
-            IArgumentHandler? handler = handlerFactory(property, instance, name);
+            ICommandLineProperty? handler = handlerFactory(property, instance, name, description);
             if (handler is null)
             {
                 continue;
