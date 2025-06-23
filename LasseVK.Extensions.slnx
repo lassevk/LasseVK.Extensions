@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Folder Name="/sandboxes/">
+    <Project Path="sandboxes\ConsoleSandbox\ConsoleSandbox.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src\LasseVK.Extensions.Configuration\LasseVK.Extensions.Configuration.csproj" Type="Classic C#" />
+    <Project Path="src\LasseVK.Extensions.Hosting.ConsoleApplications\LasseVK.Extensions.Hosting.ConsoleApplications.csproj" Type="Classic C#" />
+    <Project Path="src\LasseVK.Extensions.Hosting\LasseVK.Extensions.Hosting.csproj" Type="Classic C#" />
+    <Project Path="src\LasseVK.Extensions.Tasks\LasseVK.Extensions.Tasks.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
