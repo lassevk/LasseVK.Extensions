@@ -29,13 +29,13 @@ internal class RunCommandLineApplicationBackgroundService : BackgroundService
             throw new InvalidOperationException("No console application configured.");
         }
 
-        CommandLineArgumentsInjector.Inject(Environment.GetCommandLineArgs().Skip(1).ToArray(), consoleApplication);
-
         try
         {
+            CommandLineArgumentsInjector.Inject(Environment.GetCommandLineArgs().Skip(1).ToArray(), consoleApplication);
+
             var tcs = new TaskCompletionSource<bool>();
             _hostApplicationLifetime.ApplicationStarted.Register(() => tcs.TrySetResult(true));
-            _hostApplicationLifetime.ApplicationStopping.Register(() =>  tcs.TrySetCanceled(_hostApplicationLifetime.ApplicationStopping));
+            _hostApplicationLifetime.ApplicationStopping.Register(() => tcs.TrySetCanceled(_hostApplicationLifetime.ApplicationStopping));
             await tcs.Task;
 
             _logger.LogDebug("Starting console application");
@@ -45,6 +45,11 @@ internal class RunCommandLineApplicationBackgroundService : BackgroundService
         catch (TaskCanceledException)
         {
             _logger.LogDebug("Console application terminated by user");
+            Environment.ExitCode = 1;
+        }
+        catch (CommandLineArgumentsParsingException ex)
+        {
+            await Console.Error.WriteLineAsync("error: " + ex.Message);
             Environment.ExitCode = 1;
         }
         catch (Exception ex)

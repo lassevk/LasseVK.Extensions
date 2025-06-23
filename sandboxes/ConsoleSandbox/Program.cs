@@ -1,4 +1,6 @@
-﻿using LasseVK.Extensions.Hosting;
+﻿using ConsoleSandbox;
+
+using LasseVK.Extensions.Hosting;
 using LasseVK.Extensions.Hosting.ConsoleApplications;
 
 using Microsoft.Extensions.Hosting;
