@@ -7,13 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
-internal class RunCommandLineApplicationBackgroundServiceOptions
+internal class ConsoleApplicationHostedServiceOptions
 {
-    private Func<IServiceProvider, ICommandLineApplication>? _consoleApplicationFactory;
-    private Dictionary<string, Func<IServiceProvider, ICommandLineApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
+    private Func<IServiceProvider, IConsoleApplication>? _consoleApplicationFactory;
+    private Dictionary<string, Func<IServiceProvider, IConsoleApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
 
-    public RunCommandLineApplicationBackgroundServiceOptions SetConsoleApplication<T>(Action<T>? configure)
-        where T : ICommandLineApplication
+    public ConsoleApplicationHostedServiceOptions SetConsoleApplication<T>(Action<T>? configure)
+        where T : IConsoleApplication
     {
         if (_consoleApplicationFactory != null)
         {
@@ -30,7 +30,7 @@ internal class RunCommandLineApplicationBackgroundServiceOptions
         return this;
     }
 
-    public ICommandLineApplication? GetConsoleApplication(IServiceProvider services)
+    public IConsoleApplication? GetConsoleApplication(IServiceProvider services)
     {
         if (_consoleApplicationFactory != null)
         {
@@ -42,8 +42,8 @@ internal class RunCommandLineApplicationBackgroundServiceOptions
             throw new InvalidOperationException("No console application configured.");
         }
 
-        RunCommandLineCommandConsoleApplication application = ActivatorUtilities.CreateInstance<RunCommandLineCommandConsoleApplication>(services);
-        application.AddCommands(new Dictionary<string, Func<IServiceProvider, ICommandLineApplication>>
+        ConsoleCommandDispatcher application = ActivatorUtilities.CreateInstance<ConsoleCommandDispatcher>(services);
+        application.AddCommands(new Dictionary<string, Func<IServiceProvider, IConsoleApplication>>
         {
             ["help"] = srv => ActivatorUtilities.CreateInstance<HelpCommand>(srv),
         });
@@ -52,9 +52,9 @@ internal class RunCommandLineApplicationBackgroundServiceOptions
     }
 
     public void AddCommand<T>(Action<T>? configure)
-        where T : class, ICommandLineApplication
+        where T : class, IConsoleApplication
     {
-        string name = typeof(T).GetCustomAttribute<CommandLineCommandAttribute>()?.Name ?? typeof(T).Name.Replace("Command", "");;
+        string name = typeof(T).GetCustomAttribute<ConsoleCommandAttribute>()?.Name ?? typeof(T).Name.Replace("Command", "");;
 
         _commands.Add(name, services =>
         {
@@ -66,8 +66,8 @@ internal class RunCommandLineApplicationBackgroundServiceOptions
 
     public void AddCommand(Type type)
     {
-        string name = type.GetCustomAttribute<CommandLineCommandAttribute>()?.Name ?? type.Name.Replace("Command", "");;
+        string name = type.GetCustomAttribute<ConsoleCommandAttribute>()?.Name ?? type.Name.Replace("Command", "");;
 
-        _commands.Add(name, services => (ICommandLineApplication)ActivatorUtilities.CreateInstance(services, type));
+        _commands.Add(name, services => (IConsoleApplication)ActivatorUtilities.CreateInstance(services, type));
     }
 }

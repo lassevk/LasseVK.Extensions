@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.RelocateConfigurationFiles<Program>();
-builder.AddCommandLineCommands<Program>();
+builder.AddConsoleCommands<Program>();
 
 IHost host = builder.Build();
 await host.RunAsync();

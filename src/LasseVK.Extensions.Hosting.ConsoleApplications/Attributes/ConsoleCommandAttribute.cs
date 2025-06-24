@@ -1,9 +1,9 @@
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class CommandLineCommandAttribute : Attribute
+public class ConsoleCommandAttribute : Attribute
 {
-    public CommandLineCommandAttribute(string name)
+    public ConsoleCommandAttribute(string name)
     {
         Name = name;
     }

@@ -5,12 +5,12 @@ using LasseVK.Extensions.Hosting.ConsoleApplications.GlobalCommands;
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
-internal class RunCommandLineCommandConsoleApplication : ICommandLineApplication
+internal class ConsoleCommandDispatcher : IConsoleApplication
 {
     private readonly IServiceProvider _services;
-    private readonly Dictionary<string, Func<IServiceProvider, ICommandLineApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, Func<IServiceProvider, IConsoleApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
 
-    public RunCommandLineCommandConsoleApplication(IServiceProvider services)
+    public ConsoleCommandDispatcher(IServiceProvider services)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
     }
@@ -26,9 +26,9 @@ internal class RunCommandLineCommandConsoleApplication : ICommandLineApplication
     [Description("Arguments to pass to the command")]
     public List<string> ArgumentsToCommand { get; } = [];
 
-    public void AddCommands(Dictionary<string, Func<IServiceProvider, ICommandLineApplication>> commands)
+    public void AddCommands(Dictionary<string, Func<IServiceProvider, IConsoleApplication>> commands)
     {
-        foreach (KeyValuePair<string, Func<IServiceProvider, ICommandLineApplication>> kvp in commands)
+        foreach (KeyValuePair<string, Func<IServiceProvider, IConsoleApplication>> kvp in commands)
         {
             _commands.Add(kvp.Key, kvp.Value);
         }
@@ -44,13 +44,13 @@ internal class RunCommandLineCommandConsoleApplication : ICommandLineApplication
             return 1;
         }
 
-        if (!_commands.TryGetValue(CommandName, out Func<IServiceProvider, ICommandLineApplication>? commandFactory))
+        if (!_commands.TryGetValue(CommandName, out Func<IServiceProvider, IConsoleApplication>? commandFactory))
         {
             await Console.Error.WriteLineAsync($"error: unknown command {CommandName}");
             return 1;
         }
 
-        ICommandLineApplication command = commandFactory(_services);
+        IConsoleApplication command = commandFactory(_services);
         CommandLineArgumentsInjector.Inject(ArgumentsToCommand.ToArray(), command);
         if (command is HelpCommand help)
         {

@@ -5,9 +5,9 @@ using LasseVK.Extensions.Hosting.ConsoleApplications.Attributes;
 
 namespace ConsoleSandbox.Commands;
 
-[CommandLineCommand("list")]
+[ConsoleCommand("list")]
 [Description("Lists all files")]
-public class ListCommand : ICommandLineApplication
+public class ListCommand : IConsoleApplication
 {
     [Option("v")]
     [Option("verbose")]

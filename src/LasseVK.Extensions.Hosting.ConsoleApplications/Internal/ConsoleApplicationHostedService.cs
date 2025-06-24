@@ -4,14 +4,14 @@ using Microsoft.Extensions.Options;
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.Internal;
 
-internal class RunCommandLineApplicationBackgroundService : BackgroundService
+internal class ConsoleApplicationHostedService : BackgroundService
 {
-    private readonly IOptions<RunCommandLineApplicationBackgroundServiceOptions> _options;
+    private readonly IOptions<ConsoleApplicationHostedServiceOptions> _options;
     private readonly IServiceProvider _services;
-    private readonly ILogger<RunCommandLineApplicationBackgroundService> _logger;
+    private readonly ILogger<ConsoleApplicationHostedService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
-    public RunCommandLineApplicationBackgroundService(IOptions<RunCommandLineApplicationBackgroundServiceOptions> options, IServiceProvider services, ILogger<RunCommandLineApplicationBackgroundService> logger,
+    public ConsoleApplicationHostedService(IOptions<ConsoleApplicationHostedServiceOptions> options, IServiceProvider services, ILogger<ConsoleApplicationHostedService> logger,
         IHostApplicationLifetime  hostApplicationLifetime)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -22,7 +22,7 @@ internal class RunCommandLineApplicationBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        ICommandLineApplication? consoleApplication = _options.Value.GetConsoleApplication(_services);
+        IConsoleApplication? consoleApplication = _options.Value.GetConsoleApplication(_services);
 
         if (consoleApplication is null)
         {

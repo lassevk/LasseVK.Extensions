@@ -4,12 +4,12 @@ using LasseVK.Extensions.Hosting.ConsoleApplications.Attributes;
 
 namespace LasseVK.Extensions.Hosting.ConsoleApplications.GlobalCommands;
 
-[CommandLineCommand("help")]
+[ConsoleCommand("help")]
 [Description("Shows help for the application or for a specific command.\nUse 'help' to show a list of available commands.\nUse 'help <command>' to show help for a specific command.")]
-internal class HelpCommand : ICommandLineApplication
+internal class HelpCommand : IConsoleApplication
 {
     private readonly IServiceProvider _services;
-    private readonly Dictionary<string, Func<IServiceProvider, ICommandLineApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, Func<IServiceProvider, IConsoleApplication>> _commands = new(StringComparer.InvariantCultureIgnoreCase);
 
     public HelpCommand(IServiceProvider services)
     {
@@ -31,13 +31,13 @@ internal class HelpCommand : ICommandLineApplication
             return 0;
         }
 
-        if (!_commands.TryGetValue(CommandName, out Func<IServiceProvider, ICommandLineApplication>? commandFactory))
+        if (!_commands.TryGetValue(CommandName, out Func<IServiceProvider, IConsoleApplication>? commandFactory))
         {
             await Console.Error.WriteLineAsync($"error: unknown command {CommandName}");
             return 1;
         }
 
-        ICommandLineApplication command = commandFactory(_services);
+        IConsoleApplication command = commandFactory(_services);
         foreach (string line in CommandLineHelp.GetCommandHelp(command, CommandName.ToUpperInvariant()))
         {
             Console.WriteLine(line);
@@ -59,9 +59,9 @@ internal class HelpCommand : ICommandLineApplication
         Console.WriteLine("Use 'help <command>' for more information on a specific command.");
     }
 
-    public void AddCommands(Dictionary<string, Func<IServiceProvider, ICommandLineApplication>> commands)
+    public void AddCommands(Dictionary<string, Func<IServiceProvider, IConsoleApplication>> commands)
     {
-        foreach (KeyValuePair<string, Func<IServiceProvider, ICommandLineApplication>> kvp in commands)
+        foreach (KeyValuePair<string, Func<IServiceProvider, IConsoleApplication>> kvp in commands)
         {
             _commands.Add(kvp.Key, kvp.Value);
         }
